@@ -1,0 +1,54 @@
+extraObjects:
+  - apiVersion: external-secrets.io/v1beta1
+    kind: SecretStore
+    metadata:
+      name: gcp
+      namespace: argocd
+    spec:
+      provider:
+        gcpsm:
+          projectID: ${PROJECT_ID_V2}
+
+  - apiVersion: external-secrets.io/v1beta1
+    kind: ExternalSecret
+    metadata:
+      name: github-oauth-secret
+      namespace: argocd
+    spec:
+      secretStoreRef:
+        name: gcp
+        kind: SecretStore
+      target:
+        name: github-oauth-secret
+        creationPolicy: Owner
+      data:
+        - secretKey: clientID
+          remoteRef:
+            key: ${SECRET_NAME_V2}
+            property: clientID
+        - secretKey: clientSecret
+          remoteRef:
+            key: ${SECRET_NAME_V2}
+            property: clientSecret
+
+configs:
+  dex:
+    config:
+      connectors:
+        - type: github
+          id: github
+          name: GitHub
+          config:
+            clientID: $dex.github.clientID
+            clientSecret: $dex.github.clientSecret
+  env:
+    - name: dex.github.clientID
+      valueFrom:
+        secretKeyRef:
+          name: github-oauth-secret
+          key: clientID
+    - name: dex.github.clientSecret
+      valueFrom:
+        secretKeyRef:
+          name: github-oauth-secret
+          key: clientSecret

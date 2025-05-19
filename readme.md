@@ -16,8 +16,9 @@ This guide walks you step-by-step through setting up a GKE cluster with [Externa
 8. Grant secretAccessor role to federated KSA
 9. Create and sync ExternalSecret
 10. Install Argo CD with fixed IP
-11. Quick validation script
-12. Why each step matters
+11. Patch values
+12. Quick validation script
+13. Why each step matters
 
 ---
 
@@ -53,6 +54,9 @@ export SECRET_NAME_V2="my-secret-v2"
 export K8S_SECRET_NAME_V2="my-k8s-secret-v2"
 
 export ARGOCD_IP_NAME_V2="argocd-ip-v2"
+
+export GITHUB_CLIENT_ID="GITHUB_CLIENT_ID"
+export GITHUB_SECRET_ID="GITHUB_SECRET_ID"
 
 gcloud config set project $PROJECT_ID_V2
 gcloud config list --format="value(core.project)"
@@ -224,7 +228,12 @@ Access: https://$ARGOCD_IP_V2
 
 ⸻
 
-11 · Quick Validation Script
+11. Patch Values
+
+#!!/usr/bin/env bash
+envsubst < patch-values.yaml | helm upgrade argo-cd-v2 argo/argo-cd -n argocd -f -
+
+12 · Quick Validation Script
 
 validate-wif-v2.sh
 
@@ -251,7 +260,7 @@ kubectl get secret $K8S_SECRET_NAME_V2 -n $KSA_NAMESPACE_V2 \
 
 ⸻
 
-12 · Summary of Why Each Step Matters
+13 · Summary of Why Each Step Matters
 
 Step Purpose
 GKE with --workload-pool Enables WIF to issue federated OIDC tokens
