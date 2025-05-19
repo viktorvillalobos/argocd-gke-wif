@@ -1,0 +1,9 @@
+server:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: ${ARGOCD_IP_V2}
+
+configs:
+  secret:
+    # utiliza el mismo SecretStore si quisieras sincronizar creds
+    create: false
