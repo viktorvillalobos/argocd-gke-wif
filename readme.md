@@ -270,5 +270,3 @@ Static IP Keeps Argo CD’s public endpoint constant across deployments
  • Argo CD deployed with static IP
  • Secret from Google Secret Manager available in Kubernetes
 ```
-
-# argocd-gke-wif
