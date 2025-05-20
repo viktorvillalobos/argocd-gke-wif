@@ -17,8 +17,9 @@ This guide walks you step-by-step through setting up a GKE cluster with [Externa
 9. Create and sync ExternalSecret
 10. Install Argo CD with fixed IP
 11. Patch values
-12. Quick validation script
-13. Why each step matters
+12. Install Tailscale
+13. Quick validation script
+14. Why each step matters
 
 ---
 
@@ -233,7 +234,30 @@ Access: https://$ARGOCD_IP_V2
 #!!/usr/bin/env bash
 envsubst < patch-values.yaml | helm upgrade argo-cd-v2 argo/argo-cd -n argocd -f -
 
-12 · Quick Validation Script
+
+12. Install Tailscale
+
+
+Apply secrets:
+
+
+#!/usr/bin/env bash
+envsubst < tailscale/secretstore.yaml | kubectl apply -f -
+
+
+#!/usr/bin/env bash
+envsubst < tailscale/external-secret-store.yaml | kubectl apply -f -
+
+
+#!/usr/bin/env bash
+helm repo add tailscale https://pkgs.tailscale.com/helmcharts
+helm repo update
+helm upgrade --install tailscale-operator tailscale/tailscale-operator \
+  --namespace tailscale \
+  --set operator.tailscaleAuthSecret=tailscale-oauth
+
+
+13 · Quick Validation Script
 
 validate-wif-v2.sh
 
@@ -260,7 +284,7 @@ kubectl get secret $K8S_SECRET_NAME_V2 -n $KSA_NAMESPACE_V2 \
 
 ⸻
 
-13 · Summary of Why Each Step Matters
+14 · Summary of Why Each Step Matters
 
 Step Purpose
 GKE with --workload-pool Enables WIF to issue federated OIDC tokens
